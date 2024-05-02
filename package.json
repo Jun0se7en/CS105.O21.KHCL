@@ -1,0 +1,23 @@
+{
+  "name": "webgl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "hello_triangle.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "rm -rf .parcel-cache && parcel",
+    "build": "rm -rf .parcel-cache && parcel build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ammo.js": "^0.0.10",
+    "dat.gui": "^0.7.9",
+    "parcel": "^2.12.0",
+    "three": "^0.163.0"
+  },
+  "devDependencies": {
+    "vite": "^5.2.7"
+  }
+}
