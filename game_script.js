@@ -149,8 +149,6 @@ window.addEventListener('keydown', (event) => {
     keys.d.pressed = true
     break
   case 'Space':
-    console.log(model.position.y);
-    console.log(ground.top);
     if (Math.round(model.position.y * 100) / 100 === Math.round(ground.top * 100) / 100) {
       zombieVel = 0.13;
     }
