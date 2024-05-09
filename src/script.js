@@ -27,6 +27,16 @@ function modelCall(){
 
 await(modelCall());
 
+// Add menu audio
+var menuaudio = document.createElement('audio');
+var menuaudio_src = document.createElement('source');
+menuaudio_src.src = './src/theme/Temple Run OZ OST- Menu theme.mp3';
+menuaudio_src.type = 'audio/mpeg';
+menuaudio.appendChild(menuaudio_src);
+menuaudio.volume = 0.2;
+menuaudio.loop = true;
+menuaudio.play();
+
 // Control Volume of the Game
 var volumeUp = true;
 
@@ -42,23 +52,34 @@ volumeBtn.addEventListener('click', function() {
         var button = document.createElement('i');
         button.className = "fa fa-volume-up";
         volumeBtn.appendChild(button);
+        menuaudio.play();
     }
     else{
         var button = document.createElement('i');
         button.className = "fa fa-volume-off";
         volumeBtn.appendChild(button);
+        menuaudio.pause();
     }
 });
 
 // Button to Start a New Game   
 var NewGameBtn = document.getElementById("New Game");
 NewGameBtn.addEventListener('click', function(){
+    menuaudio.muted = true;
     var body = document.getElementById('body');
     let child = body.lastElementChild;  
         while (child) { 
             body.removeChild(child); 
             child = body.lastElementChild; 
         }
+    var gameaudio = document.createElement('audio');
+    var gameaudio_src = document.createElement('source');
+    gameaudio_src.src = './src/theme/Temple Run OZ OST- Whimsy Woods.mp3';
+    gameaudio_src.type = 'audio/mpeg';
+    gameaudio.appendChild(gameaudio_src);
+    gameaudio.volume = 0.2;
+    gameaudio.loop = true;
+    gameaudio.play();
     // Initialize Variables
     let camera = new THREE.PerspectiveCamera(
         45,
@@ -111,8 +132,8 @@ NewGameBtn.addEventListener('click', function(){
         scene.add(new THREE.AmbientLight(0xffffff, 0.5));
         scene.add(model);
     
-        camera.position.x = 1;
-        camera.position.y = 2;
+        camera.position.x = 0.5;
+        camera.position.y = 1.5;
         camera.position.z = 5;
     
         camera.lookAt(new THREE.Vector3(0, 0, 0));
@@ -178,6 +199,7 @@ NewGameBtn.addEventListener('click', function(){
             enemy.update(boxes);
             if (zombieCollision({zombie: model, box: enemy, bboxsize: size, zombieVel: zombieVel})) {
               cancelAnimationFrame(animationId);
+              gameaudio.muted = true;
             }
           })
           
