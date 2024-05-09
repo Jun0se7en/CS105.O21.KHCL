@@ -1,22 +1,40 @@
-<style>
-  body {
-    margin: 0;
-    background: #0c4a6e;
-  }
-</style>
-
-<script
-  async
-  src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"
-></script>
-
-<script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.150.1/examples/jsm/"
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'>
+    <link rel="stylesheet" href="styles.css">
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+        "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.150.1/examples/jsm/"
+        }
     }
-  }
-</script>
+    </script>
+    <script type="module" src="./src/script.js"></script>
+</head>
 
-<script type="module" src="./game_script.js"></script>
+<body id="body">
+    <ul id="nav">
+        <li class="nav-link">
+            <h1 data-name="New Game" id="New Game">New Game</h1>
+        </li>
+        <li class="nav-link">
+            <h1 data-name="High Scores" id="High Scores">High Scores</h1>
+        </li>
+        <li class="nav-link">
+            <h1 data-name="Settings" id="Settings">Settings</h1>
+        </li>
+        <li class="nav-link">
+            <h1 data-name="Quit" id="Quit">Quit</h1>
+        </li>
+    </ul>
+
+    <aside class="_menu">
+        <ul class="_links-list">
+            <li class="_volume" id="volume"><a id="volumeBtn"><i class="fa fa-volume-up"></i></a></li>
+        </ul>
+    </aside>
+</body>
+</html>
