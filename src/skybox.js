@@ -18,7 +18,7 @@ export default function Skybox(scene){
     for (let i = 0; i < 6; i++)
         materialArray[i].side = THREE.BackSide;
 
-    let skyboxGeo = new THREE.BoxGeometry( 800, 1000, 1000);
+    let skyboxGeo = new THREE.BoxGeometry( 600, 1000, 800);
     let skybox = new THREE.Mesh( skyboxGeo, materialArray );
     skybox.position.y = -50
 
