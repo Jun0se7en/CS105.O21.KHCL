@@ -38,7 +38,7 @@ export default class ExtendBox extends THREE.Mesh {
         this.front = this.position.z + this.depth/2
         this.back = this.position.z - this.depth/2
   
-        if (this.isZaccelerated) this.velocity.z += 0.001
+        if (this.isZaccelerated) this.velocity.z += 0.01
   
         this.position.x += this.velocity.x
         this.position.z += this.velocity.z
