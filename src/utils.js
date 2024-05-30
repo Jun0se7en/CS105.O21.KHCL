@@ -10,11 +10,11 @@ function boxCollision({box1, box2}){
 export default class ExtendBox extends THREE.Mesh {
 
     constructor({width, heigth, depth, color="#00ff00", 
-                velocity={x: 0, y: 0, z: 0}, position={x: 0, y: 0, z: 0}, isZaccelerated=false
+                velocity={x: 0, y: 0, z: 0}, position={x: 0, y: 0, z: 0}, isZaccelerated=false, texture
               }) {
       super(
         new THREE.BoxGeometry(width, heigth, depth), 
-        new THREE.MeshStandardMaterial({ color: color }))
+        new THREE.MeshStandardMaterial({ color: color, map: texture}))
       this.width = width,
       this.heigth = heigth,
       this.depth = depth,
@@ -25,7 +25,7 @@ export default class ExtendBox extends THREE.Mesh {
       this.left = this.position.x - this.width/2,
       this.front = this.position.z + this.depth/2,
       this.back = this.position.z - this.depth/2,
-      this.velocity = velocity
+      this.velocity = velocity,
       this.isZaccelerated = isZaccelerated
     }
   
