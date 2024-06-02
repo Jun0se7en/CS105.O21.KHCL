@@ -18,7 +18,7 @@ function createTextTexture(text, width = 256, height = 128) {
 
   var texture = new THREE.CanvasTexture(canvas);
   return texture;
-}
+};
 
 let model;
 let runAnimation;
