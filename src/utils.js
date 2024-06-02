@@ -10,7 +10,7 @@ function boxCollision({box1, box2}){
 export default class ExtendBox extends THREE.Mesh {
 
     constructor({width, heigth, depth, color="#00ff00", 
-                velocity={x: 0, y: 0, z: 0}, position={x: 0, y: 0, z: 0}, isZaccelerated=false, texture
+                velocity={x: 0, y: 0, z: 0}, position={x: 0, y: 0, z: 0}, isZaccelerated=false, texture=None
               }) {
       super(
         new THREE.BoxGeometry(width, heigth, depth), 

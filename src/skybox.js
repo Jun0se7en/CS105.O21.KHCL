@@ -1,5 +1,5 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
-export default function Skybox(scene){
+export default function Skybox(scene) {
     let materialArray = [];
     let texture_ft = new THREE.TextureLoader().load( '/src/model/skybox/Daylight Box_Front.bmp');
     let texture_bk = new THREE.TextureLoader().load( '/src/model/skybox/Daylight Box_Back.bmp');
@@ -20,8 +20,8 @@ export default function Skybox(scene){
 
     let skyboxGeo = new THREE.BoxGeometry( 600, 1000, 800);
     let skybox = new THREE.Mesh( skyboxGeo, materialArray );
-    skybox.position.y = -50
+    skybox.position.y = -50;
 
-    scene.add(skybox)
+    scene.add(skybox);
 
 }

@@ -204,6 +204,9 @@ NewGameBtn.addEventListener('click', function(){
     boundingBox.getSize(new THREE.Vector3());
     const size = boundingBox.getSize(new THREE.Vector3());
 
+    const enemy_texture = new THREE.TextureLoader().load("./src/model/enemy/marbel-008.jpg");
+    //const enemy_material = new THREE.MeshBasicMaterial({map: box_texture});
+
     function animate() {
         const animationId = requestAnimationFrame(animate);
         delta += clock.getDelta();
@@ -290,8 +293,9 @@ NewGameBtn.addEventListener('click', function(){
                 y: 0,
                 z: 0.005,
               },
-              color: "#800020",
-              isZaccelerated: true
+              color: "#bcbcbc",
+              isZaccelerated: true,
+              texture: enemy_texture,
             })
             enemy.castShadow = true
             scene.add(enemy)
