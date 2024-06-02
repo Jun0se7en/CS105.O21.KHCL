@@ -39,6 +39,11 @@ function modelCall(){
             const action = runAnimation.clipAction(animObject.animations[0]);
             action.play();
         });
+    loader.load('fall.fbx', (anumObject) => {
+            runAnimation_2 = new THREE.AnimationMixer(model);
+            const action_2 = runAnimation_2.clipAction(animObject.animations[0]);
+           // action.play();
+    }) 
     });
 };
 
