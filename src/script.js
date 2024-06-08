@@ -1,6 +1,6 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
 import {FBXLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/FBXLoader.js';
-// import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
 import ExtendBox from './utils.js'
 import Building from './buildings.js';
 import Sound from './sound.js';
@@ -54,11 +54,11 @@ const sound = new Sound();
 sound.source = './src/theme/Temple Run OZ OST- Menu theme.mp3';
 sound.menu_load();
 
-// Init Clock
-let clock = new THREE.Clock();
-let delta = 0;
-// 30 fps
-let interval = 1 / 60;
+// // Init Clock
+// let clock = new THREE.Clock();
+// let delta = 0;
+// // 30 fps
+// let interval = 1 / 60;
 
 // Button to Start a New Game   
 var NewGameBtn = document.getElementById("New Game");
@@ -95,6 +95,9 @@ NewGameBtn.addEventListener('click', function(){
 
     const enemies = []
     const buildings = []
+    const buildings_1 = []
+    const sidewalks = []
+    const sidewalks_1 = []
     let frames = 0;
     let spawnRate = 20;
     renderer.shadowMap.enabled = true;
@@ -143,6 +146,8 @@ NewGameBtn.addEventListener('click', function(){
             texture: texture1,
           });
         boxes.receiveShadow = true;
+    
+
         // Create light Object
         const light= new THREE.DirectionalLight(0xffffff, 2);
         light.position.y = 3;
@@ -201,8 +206,6 @@ NewGameBtn.addEventListener('click', function(){
 
     init();
     
-    let spawnDirection = Math.random() > 0.5 ? 1 : -1;
-    let spawnZ = 20;
     let scores = 0;
     let text_mesh = null;
     const boundingBox = new THREE.Box3().setFromObject(model);
@@ -214,13 +217,14 @@ NewGameBtn.addEventListener('click', function(){
 
     function animate() {
         const animationId = requestAnimationFrame(animate);
-        delta += clock.getDelta();
-        if (delta  > interval) {
-            // The draw or time dependent code are here
-            renderer.render(scene, camera);
+        // delta += clock.getDelta();
+        // if (delta  > interval) {
+        //     // The draw or time dependent code are here
+        //     renderer.render(scene, camera);
 
-            delta = delta % interval;
-        }
+        //     delta = delta % interval;
+        // }
+        renderer.render(scene, camera);
         if (keys.a.pressed) {
             model.position.x -= 0.1;
           }
@@ -244,45 +248,94 @@ NewGameBtn.addEventListener('click', function(){
             }
           })
           // Update buildings
-          if (buildings.length >= 4) {
-            buildings.forEach(building => {
-              building.update();
-            })
-          }
-          
-          if(frames % 10 === 0){
-            const newBuildingZ = -(Math.floor(Math.random() * spawnZ))
-            const rotationY = spawnDirection > 0 ? -Math.PI/2 : Math.PI/2;
+          buildings.forEach(building => {
+            building.update();
+          })
+
+          //let spawnZ = 20;
+          if(frames % 40 === 0){
+            //const newBuildingZ = -(Math.floor(Math.random() * spawnZ))
+            //const newBuildingX = spawnX * spawnDirection;
+            const rotationY = Math.PI/2
             const building = new Building(
               {
                   scene: scene,
                   loader: new FBXLoader(),
                   scale: 0.03,
-                  position: {x: 10, y: -3, z: newBuildingZ},
+                  position: {x: -10, y: -1.5, z: -25},
                   rotation: {x: 0, y: rotationY, z: 0},
                   velocity: {x: 0, y: 0, z: 0.2},
                   isZaccelerated: true
               }); 
             building.castShadow = true
             buildings.push(building);
-            const building1 = new Building(
+          } 
+
+          buildings_1.forEach(building => {
+            building.update();
+          })
+          
+          if(frames % 40 === 0){
+            const rotationY = -Math.PI/2
+            const building = new Building(
               {
                   scene: scene,
                   loader: new FBXLoader(),
                   scale: 0.03,
-                  position: {x: -10, y: -3, z: newBuildingZ},
+                  position: {x: 10, y: -1.5, z: -25},
                   rotation: {x: 0, y: rotationY, z: 0},
                   velocity: {x: 0, y: 0, z: 0.2},
                   isZaccelerated: true
               }); 
-            building1.castShadow = true
-            buildings.push(building1);
-            spawnDirection *= -1
-          } 
+            building.castShadow = true
+            buildings.push(building);
+          }
+
+        //Create sidewalk at both sides
+        sidewalks.forEach(sidewalk => {
+          sidewalk.update(boxes);
+        })
+        var texture2 = textureLoader.load( './sidewalk.jpg' );
+        if(frames % 50 === 0){
+          const sidewalk_1 = new ExtendBox({
+              width: 11,
+              heigth: 0.5,
+              depth: 10,
+              color: "#5b5b5b",
+              position: {x: -10, y: -1.7, z: -25},
+              texture: texture2,
+              isZaccelerated: true,
+              velocity: {x: 0, y: 0, z: 0.1},
+            });
+          sidewalk_1.receiveShadow = true;
+          scene.add(sidewalk_1);
+          sidewalks.push(sidewalk_1);
+        }
+        sidewalks_1.forEach(sidewalk => {
+          sidewalk.update(boxes);
+        })
+
+        if(frames % 50 === 0){
+          const sidewalk_2 = new ExtendBox({
+              width: 11,
+              heigth: 0.5,
+              depth: 10,
+              color: "#5b5b5b",
+              position: {x: 10, y: -1.7, z: -25},
+              texture: texture2,
+              isZaccelerated: true,
+              velocity: {x: 0, y: 0, z: 0.1},
+            });
+          sidewalk_2.receiveShadow = true;
+          scene.add(sidewalk_2);
+          sidewalks_1.push(sidewalk_2);
+        }
+        
+        
 
         // console.log('count')
           if (frames % spawnRate === 0) {
-            // if (spawnRate > 20) spawnRate -= 30; else spawnRate += 20;
+            //if (spawnRate > 20) spawnRate -= 20; //else spawnRate += 20;
         
             const enemy = new ExtendBox ({
               width: 1,
@@ -296,7 +349,7 @@ NewGameBtn.addEventListener('click', function(){
               velocity: {
                 x: 0,
                 y: 0,
-                z: 0.005,
+                z: 0.2,
               },
               color: "#bcbcbc",
               isZaccelerated: true,
@@ -306,6 +359,38 @@ NewGameBtn.addEventListener('click', function(){
             scene.add(enemy)
             enemies.push(enemy)
           }
+          //Remove enemies
+          enemies.forEach((enemy, index) => {
+            if (enemy.position.z > 10) {
+              scene.remove(enemy)
+              enemies.splice(index, 1)
+            }
+          })
+
+          //Remove buildings
+          buildings.forEach((building, index) => {
+            if (building.position.z > 10) {
+              scene.remove(building.building)
+              buildings.splice(index, 1)
+            }
+          })
+
+          //Remove sidewalks
+          sidewalks.forEach((sidewalk, index) => {
+            if (sidewalk.position.z > 10) {
+              scene.remove(sidewalk)
+              sidewalks.splice(index, 1)
+            }
+          })
+          sidewalks_1.forEach((sidewalk, index) => {
+            if (sidewalk.position.z > 10) {
+              scene.remove(sidewalk)
+              sidewalks_1.splice(index, 1)
+            }
+          })
+
+
+
           if (runAnimation) {
                 runAnimation.update(0.01); 
           }
