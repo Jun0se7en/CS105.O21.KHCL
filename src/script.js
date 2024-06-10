@@ -6,6 +6,10 @@ import Building from './buildings.js';
 import Sound from './sound.js';
 import Skybox from './skybox.js';
 
+function sleep(time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
+
 function createTextTexture(text, width = 256, height = 128) {
   var canvas = document.createElement('canvas');
   canvas.width = width;
@@ -22,9 +26,9 @@ function createTextTexture(text, width = 256, height = 128) {
 
 let model;
 let runAnimation;
+const loader = new FBXLoader();
 // Import model 
 function modelCall(){
-    const loader = new FBXLoader();
     loader.setPath('./src/model/');
     loader.load('mremireh_o_desbiens.fbx', (fbx) => {
     fbx.scale.setScalar(0.01);
@@ -39,11 +43,6 @@ function modelCall(){
             const action = runAnimation.clipAction(animObject.animations[0]);
             action.play();
         });
-    loader.load('fall.fbx', (anumObject) => {
-            runAnimation_2 = new THREE.AnimationMixer(model);
-            const action_2 = runAnimation_2.clipAction(animObject.animations[0]);
-           // action.play();
-    }) 
     });
 };
 
@@ -70,6 +69,18 @@ NewGameBtn.addEventListener('click', function(){
             body.removeChild(child); 
             child = body.lastElementChild; 
         }
+    var h2 = document.createElement('h2');
+    h2.textContent = 'Loading Game!!!';
+    var loaderDiv = document.createElement('div');
+    loaderDiv.className = 'loader';
+    body.appendChild(h2);
+    body.appendChild(loaderDiv);
+    sleep(500).then(() => {
+      child = body.lastElementChild;  
+      while (child) { 
+          body.removeChild(child); 
+          child = body.lastElementChild; 
+      }
     //In-game sound
     sound.source = './src/theme/Temple Run OZ OST- Whimsy Woods.mp3';
     sound.game_load();
@@ -98,6 +109,8 @@ NewGameBtn.addEventListener('click', function(){
     const buildings_1 = []
     const sidewalks = []
     const sidewalks_1 = []
+    const frameRate = [40, 80, 120, 160]
+
     let frames = 0;
     let spawnRate = 20;
     renderer.shadowMap.enabled = true;
@@ -129,8 +142,8 @@ NewGameBtn.addEventListener('click', function(){
     
 
     function init(){
-        // const orbitControls = new OrbitControls(camera, renderer.domElement);
-        // orbitControls.update();
+        const orbitControls = new OrbitControls(camera, renderer.domElement);
+        orbitControls.update();
 
         //Add skybox
         Skybox(scene);
@@ -153,6 +166,18 @@ NewGameBtn.addEventListener('click', function(){
         light.position.y = 3;
         light.position.z = 1;
         light.castShadow = true;
+
+
+
+
+        const spotLight = new THREE.SpotLight(0xffffff, 1);
+        spotLight.position.set(0, 10, -30);
+        spotLight.castShadow = true;
+        scene.add(spotLight);
+
+        const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+        scene.add(spotLightHelper);
+
 
         // Add Object to Scene
         scene.add(boxes);
@@ -243,8 +268,20 @@ NewGameBtn.addEventListener('click', function(){
           enemies.forEach(enemy => {
             enemy.update(boxes);
             if (zombieCollision({zombie: model, box: enemy, bboxsize: size, zombieVel: zombieVel})) {
-              cancelAnimationFrame(animationId);
-              sound.gameaudio.muted = true;
+              //Zombie fall animation here
+              // loader.load('fall.fbx', (animObject) => {
+
+              //   const fallAnimation = new THREE.AnimationMixer(model);
+              //   const action = fallAnimation.clipAction(animObject.animations[0]);
+              //   action.play();
+              //   setTimeout(() => {
+              //     scene.remove(model);
+              //     cancelAnimationFrame(animationId);
+              //     alert('Game Over');
+              //   }, 2000);
+              // })
+              // cancelAnimationFrame(animationId);
+              // sound.gameaudio.muted = true;
             }
           })
           // Update buildings
@@ -253,7 +290,7 @@ NewGameBtn.addEventListener('click', function(){
           })
 
           //let spawnZ = 20;
-          if(frames % 40 === 0){
+          if(frames % frameRate[Math.floor(Math.random() * 4)] === 0){
             //const newBuildingZ = -(Math.floor(Math.random() * spawnZ))
             //const newBuildingX = spawnX * spawnDirection;
             const rotationY = Math.PI/2
@@ -275,7 +312,7 @@ NewGameBtn.addEventListener('click', function(){
             building.update();
           })
           
-          if(frames % 40 === 0){
+          if(frames % frameRate[Math.floor(Math.random() * 4)] === 0){
             const rotationY = -Math.PI/2
             const building = new Building(
               {
@@ -377,13 +414,13 @@ NewGameBtn.addEventListener('click', function(){
 
           //Remove sidewalks
           sidewalks.forEach((sidewalk, index) => {
-            if (sidewalk.position.z > 10) {
+            if (sidewalk.position.z > 20) {
               scene.remove(sidewalk)
               sidewalks.splice(index, 1)
             }
           })
           sidewalks_1.forEach((sidewalk, index) => {
-            if (sidewalk.position.z > 10) {
+            if (sidewalk.position.z > 20) {
               scene.remove(sidewalk)
               sidewalks_1.splice(index, 1)
             }
@@ -425,6 +462,7 @@ NewGameBtn.addEventListener('click', function(){
           scene.add(text_mesh);
     }
     animate();
+  });
 });
 
 
