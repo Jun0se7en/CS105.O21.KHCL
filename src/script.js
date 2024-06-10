@@ -6,6 +6,10 @@ import Building from './buildings.js';
 import Sound from './sound.js';
 import Skybox from './skybox.js';
 
+function sleep(time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
+
 function createTextTexture(text, width = 256, height = 128) {
   var canvas = document.createElement('canvas');
   canvas.width = width;
@@ -70,6 +74,18 @@ NewGameBtn.addEventListener('click', function(){
             body.removeChild(child); 
             child = body.lastElementChild; 
         }
+    var h2 = document.createElement('h2');
+    h2.textContent = 'Loading Game!!!';
+    var loaderDiv = document.createElement('div');
+    loaderDiv.className = 'loader';
+    body.appendChild(h2);
+    body.appendChild(loaderDiv);
+    sleep(500).then(() => {
+      child = body.lastElementChild;  
+      while (child) { 
+          body.removeChild(child); 
+          child = body.lastElementChild; 
+      }
     //In-game sound
     sound.source = './src/theme/Temple Run OZ OST- Whimsy Woods.mp3';
     sound.game_load();
@@ -425,6 +441,7 @@ NewGameBtn.addEventListener('click', function(){
           scene.add(text_mesh);
     }
     animate();
+  });
 });
 
 
