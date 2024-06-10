@@ -26,9 +26,9 @@ function createTextTexture(text, width = 256, height = 128) {
 
 let model;
 let runAnimation;
+const loader = new FBXLoader();
 // Import model 
 function modelCall(){
-    const loader = new FBXLoader();
     loader.setPath('./src/model/');
     loader.load('mremireh_o_desbiens.fbx', (fbx) => {
     fbx.scale.setScalar(0.01);
@@ -36,18 +36,13 @@ function modelCall(){
         c.castShadow = true;
     });
     fbx.rotation.y += Math.PI;
-    fbx.position.set(0, -1.75, 6);
+    fbx.position.set(0, -1.75, 10);
     model = fbx;
     loader.load('run.fbx', (animObject) => {
             runAnimation = new THREE.AnimationMixer(model);
             const action = runAnimation.clipAction(animObject.animations[0]);
             action.play();
         });
-    loader.load('fall.fbx', (anumObject) => {
-            runAnimation_2 = new THREE.AnimationMixer(model);
-            const action_2 = runAnimation_2.clipAction(animObject.animations[0]);
-           // action.play();
-    }) 
     });
 };
 
@@ -110,13 +105,16 @@ NewGameBtn.addEventListener('click', function(){
               space: {pressed: false}};
 
     const enemies = []
-    const buildings = []
     const buildings_1 = []
-    const sidewalks = []
+    const buildings_2 = []
     const sidewalks_1 = []
+    const sidewalks_2 = []
+    const frameRate = [40, 80, 120, 160]
+
     let frames = 0;
     let spawnRate = 20;
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.domElement.id='Canvas'
     document.getElementById('body').appendChild(renderer.domElement);
@@ -140,13 +138,13 @@ NewGameBtn.addEventListener('click', function(){
       renderer.setSize(window.innerWidth, window.innerHeight);
     }
     
-    // Lắng nghe sự kiện thay đổi kích thước cửa sổ
+    // Event listener to resize the window
     window.addEventListener('resize', onWindowResize, false);
     
 
     function init(){
-        // const orbitControls = new OrbitControls(camera, renderer.domElement);
-        // orbitControls.update();
+        const orbitControls = new OrbitControls(camera, renderer.domElement);
+        orbitControls.update();
 
         //Add skybox
         Skybox(scene);
@@ -154,21 +152,48 @@ NewGameBtn.addEventListener('click', function(){
         // Create Box Object
         var texture1 = textureLoader.load( './NkL8C.jpg' );
         boxes = new ExtendBox({
-            width: 11,
+            width: 15,
             heigth: 0.5,
-            depth: 50,
+            depth: 80,
             color: "#5b5b5b",
-            position: {x: 0, y: -2, z: 0},
+            position: {x: 0, y: -2, z: -10},
             texture: texture1,
           });
         boxes.receiveShadow = true;
     
+        //Create fog effect
+        scene.fog = new THREE.Fog(0xffffff, 1, 60);
 
+ 
         // Create light Object
         const light= new THREE.DirectionalLight(0xffffff, 2);
         light.position.y = 3;
         light.position.z = 1;
         light.castShadow = true;
+
+
+        //Create spotlight
+        const spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(0, 20, -40);
+        spotLight.castShadow = true;
+
+        spotLight.decay = 2;
+        spotLight.penumbra = 0.05;
+        spotLight.angle = Math.PI / 4;
+        
+        // spotLight.shadow.mapSize.width = 1024;
+        // spotLight.shadow.mapSize.height = 1024;
+        
+        // spotLight.shadow.camera.near = 500;
+        // spotLight.shadow.camera.far = 4000;
+        // spotLight.shadow.camera.fov = 30;
+
+        
+        scene.add(spotLight);
+
+        const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+        scene.add(spotLightHelper);
+
 
         // Add Object to Scene
         scene.add(boxes);
@@ -177,10 +202,11 @@ NewGameBtn.addEventListener('click', function(){
         scene.add(model);
     
         camera.position.x = 0;
-        camera.position.y = 2.5;
-        camera.position.z = 10;
+        camera.position.y = 3;
+        camera.position.z = 15;
         
-        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        camera.lookAt(new THREE.Vector3(0, -2, -1));
+
     }
 
     function zombieCollision({zombie, box, bboxsize, zombieVel}){
@@ -241,6 +267,7 @@ NewGameBtn.addEventListener('click', function(){
         //     delta = delta % interval;
         // }
         renderer.render(scene, camera);
+
         if (keys.a.pressed) {
             model.position.x -= 0.1;
           }
@@ -259,17 +286,29 @@ NewGameBtn.addEventListener('click', function(){
           enemies.forEach(enemy => {
             enemy.update(boxes);
             if (zombieCollision({zombie: model, box: enemy, bboxsize: size, zombieVel: zombieVel})) {
-              cancelAnimationFrame(animationId);
-              sound.gameaudio.muted = true;
+              //Zombie fall animation here
+              // loader.load('fall.fbx', (animObject) => {
+
+              //   const fallAnimation = new THREE.AnimationMixer(model);
+              //   const action = fallAnimation.clipAction(animObject.animations[0]);
+              //   action.play();
+              //   setTimeout(() => {
+              //     scene.remove(model);
+              //     cancelAnimationFrame(animationId);
+              //     alert('Game Over');
+              //   }, 2000);
+              // })
+              // cancelAnimationFrame(animationId);
+              // sound.gameaudio.muted = true;
             }
           })
           // Update buildings
-          buildings.forEach(building => {
+          buildings_1.forEach(building => {
             building.update();
           })
 
           //let spawnZ = 20;
-          if(frames % 40 === 0){
+          if(frames % frameRate[Math.floor(Math.random() * 4)] === 0){
             //const newBuildingZ = -(Math.floor(Math.random() * spawnZ))
             //const newBuildingX = spawnX * spawnDirection;
             const rotationY = Math.PI/2
@@ -278,73 +317,73 @@ NewGameBtn.addEventListener('click', function(){
                   scene: scene,
                   loader: new FBXLoader(),
                   scale: 0.03,
-                  position: {x: -10, y: -1.5, z: -25},
+                  position: {x: -15, y: -1.5, z: -45},
                   rotation: {x: 0, y: rotationY, z: 0},
                   velocity: {x: 0, y: 0, z: 0.2},
                   isZaccelerated: true
               }); 
             building.castShadow = true
-            buildings.push(building);
+            buildings_1.push(building);
           } 
 
-          buildings_1.forEach(building => {
+          buildings_2.forEach(building => {
             building.update();
           })
           
-          if(frames % 40 === 0){
+          if(frames % frameRate[Math.floor(Math.random() * 4)] === 0){
             const rotationY = -Math.PI/2
             const building = new Building(
               {
                   scene: scene,
                   loader: new FBXLoader(),
                   scale: 0.03,
-                  position: {x: 10, y: -1.5, z: -25},
+                  position: {x: 15, y: -1.5, z: -45},
                   rotation: {x: 0, y: rotationY, z: 0},
                   velocity: {x: 0, y: 0, z: 0.2},
                   isZaccelerated: true
               }); 
             building.castShadow = true
-            buildings.push(building);
+            buildings_2.push(building);
           }
 
         //Create sidewalk at both sides
-        sidewalks.forEach(sidewalk => {
+        sidewalks_1.forEach(sidewalk => {
           sidewalk.update(boxes);
         })
         var texture2 = textureLoader.load( './sidewalk.jpg' );
         if(frames % 50 === 0){
           const sidewalk_1 = new ExtendBox({
-              width: 11,
+              width: 20,
               heigth: 0.5,
               depth: 10,
               color: "#5b5b5b",
-              position: {x: -10, y: -1.7, z: -25},
+              position: {x: -17, y: -1.7, z: -40},
               texture: texture2,
               isZaccelerated: true,
               velocity: {x: 0, y: 0, z: 0.1},
             });
           sidewalk_1.receiveShadow = true;
           scene.add(sidewalk_1);
-          sidewalks.push(sidewalk_1);
+          sidewalks_1.push(sidewalk_1);
         }
-        sidewalks_1.forEach(sidewalk => {
+        sidewalks_2.forEach(sidewalk => {
           sidewalk.update(boxes);
         })
 
         if(frames % 50 === 0){
           const sidewalk_2 = new ExtendBox({
-              width: 11,
+              width: 20,
               heigth: 0.5,
               depth: 10,
               color: "#5b5b5b",
-              position: {x: 10, y: -1.7, z: -25},
+              position: {x: 17, y: -1.7, z: -40},
               texture: texture2,
               isZaccelerated: true,
               velocity: {x: 0, y: 0, z: 0.1},
             });
           sidewalk_2.receiveShadow = true;
           scene.add(sidewalk_2);
-          sidewalks_1.push(sidewalk_2);
+          sidewalks_2.push(sidewalk_2);
         }
         
         
@@ -377,31 +416,37 @@ NewGameBtn.addEventListener('click', function(){
           }
           //Remove enemies
           enemies.forEach((enemy, index) => {
-            if (enemy.position.z > 10) {
+            if (enemy.position.z > 20) {
               scene.remove(enemy)
               enemies.splice(index, 1)
             }
           })
 
           //Remove buildings
-          buildings.forEach((building, index) => {
-            if (building.position.z > 10) {
+          buildings_1.forEach((building, index) => {
+            if (building.position.z > 30) {
               scene.remove(building.building)
-              buildings.splice(index, 1)
+              buildings_1.splice(index, 1)
+            }
+          })
+          buildings_2.forEach((building, index) => {
+            if (building.position.z > 30) {
+              scene.remove(building.building)
+              buildings_2.splice(index, 1)
             }
           })
 
           //Remove sidewalks
-          sidewalks.forEach((sidewalk, index) => {
-            if (sidewalk.position.z > 10) {
-              scene.remove(sidewalk)
-              sidewalks.splice(index, 1)
-            }
-          })
           sidewalks_1.forEach((sidewalk, index) => {
-            if (sidewalk.position.z > 10) {
+            if (sidewalk.position.z > 30) {
               scene.remove(sidewalk)
               sidewalks_1.splice(index, 1)
+            }
+          })
+          sidewalks_2.forEach((sidewalk, index) => {
+            if (sidewalk.position.z > 30) {
+              scene.remove(sidewalk)
+              sidewalks_2.splice(index, 1)
             }
           })
 
