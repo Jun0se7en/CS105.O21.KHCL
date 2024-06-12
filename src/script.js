@@ -596,12 +596,12 @@ function NewGame(){
               enemies.splice(index, 1)
             }
           })
-          // enemies_sphere.forEach((enemy, index) => {
-          //   if (enemy.position.z > 20) {
-          //     scene.remove(enemy)
-          //     enemies_sphere.splice(index, 1)
-          //   }
-          // })
+          enemies_sphere.forEach((enemy, index) => {
+             if (enemy.position.z > 20) {
+               scene.remove(enemy)
+               enemies_sphere.splice(index, 1)
+             }
+          })
 
           //Remove sidewalks
           sidewalks_1.forEach((sidewalk, index) => {
