@@ -160,9 +160,12 @@ NewGameBtn.addEventListener('click', function(){
             texture: texture1,
           });
         boxes.receiveShadow = true;
-    
-        //Create fog effect
-        scene.fog = new THREE.Fog(0xffffff, 1, 60);
+
+      
+        //Create fog effect at a certain area
+        scene.fog = new THREE.Fog(0xffffff, 3, 60);
+        scene.fog.density = 0.1;
+
 
  
         // Create light Object
@@ -302,6 +305,11 @@ NewGameBtn.addEventListener('click', function(){
               // sound.gameaudio.muted = true;
             }
           })
+
+          //Update tunnel
+
+
+          
           // Update buildings
           buildings_1.forEach(building => {
             building.update();

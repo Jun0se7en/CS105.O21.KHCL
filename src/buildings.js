@@ -8,7 +8,7 @@ const building_sources = [
 export default class Building {
     constructor({ scene, loader, scale,
         position = { x: 0, y: 0, z: 0 }, velocity = { x: 0, y: 0, z: 0 },
-        rotation = { x: 0, y: 0, z: 0 }, isZaccelerated = false }) {
+        rotation = { x: 0, y: 0, z: 0 }, isZaccelerated = false, file = building_sources[Math.floor(Math.random() * building_sources.length)]}) {
         this.scene = scene;
         this.loader = loader;
         this.src ='./src/model/buildings/';
@@ -18,7 +18,7 @@ export default class Building {
         this.velocity = velocity;
         this.isZaccelerated = isZaccelerated;
         this.building = null; // Initialize the building property
-        this.file = building_sources[Math.floor(Math.random() * building_sources.length)];
+        this.file = file;
         this.lifetime = 5000
         this.spawnTime = Date.now()
         // Load the model when the Building instance is created
