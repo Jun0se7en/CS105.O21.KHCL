@@ -54,7 +54,7 @@ function modelCall(){
 await(modelCall()); 
 
 // Menu sound
-const sound = new Sound();
+let sound = new Sound();
 sound.source = './src/theme/Temple Run OZ OST- Menu theme.mp3';
 sound.menu_load();
 
@@ -64,16 +64,119 @@ sound.menu_load();
 // // 30 fps
 // let interval = 1 / 60;
 
-// Button to Start a New Game   
-var NewGameBtn = document.getElementById("New Game");
-NewGameBtn.addEventListener('click', function(){
-    sound.menuaudio.muted = true;
+// Menu Function
+function Menu(body){
+  let child = body.lastElementChild;  
+  while (child) { 
+      body.removeChild(child); 
+      child = body.lastElementChild; 
+  };
+  // Tạo phần tử ul có id là 'nav'
+  var navUl = document.createElement("ul");
+  navUl.id = "nav";
+
+  // Tạo các phần tử li và h1 cho menu điều hướng và thêm vào navUl
+  var menuItems = [
+      { name: "New Game", id: "New Game" },
+      { name: "High Scores", id: "High Scores" },
+      { name: "Settings", id: "Settings" },
+      { name: "Quit", id: "Quit" }
+  ];
+
+  menuItems.forEach(function(item) {
+      var li = document.createElement("li");
+      li.className = "nav-link";
+      
+      var h1 = document.createElement("h1");
+      h1.dataset.name = item.name;
+      h1.id = item.id;
+      h1.textContent = item.name;
+      
+      li.appendChild(h1);
+      navUl.appendChild(li);
+  });
+
+  // Tạo phần tử aside có class là '_menu'
+  var asideMenu = document.createElement("aside");
+  asideMenu.className = "_menu";
+
+  // Tạo phần tử ul có class là '_links-list' và thêm vào asideMenu
+  var linksListUl = document.createElement("ul");
+  linksListUl.className = "_links-list";
+
+  // Tạo phần tử li và a cho volume control và thêm vào linksListUl
+  var volumeLi = document.createElement("li");
+  volumeLi.className = "_volume";
+  volumeLi.id = "volume";
+
+  var volumeA = document.createElement("a");
+  volumeA.id = "volumeBtn";
+  volumeA.innerHTML = '<i class="fa fa-volume-up"></i>';
+
+  volumeLi.appendChild(volumeA);
+  linksListUl.appendChild(volumeLi);
+  asideMenu.appendChild(linksListUl);
+
+  // Thêm navUl và asideMenu vào body
+  body.appendChild(navUl);
+  body.appendChild(asideMenu);
+  var NewGameBtn = document.getElementById("New Game");
+  NewGameBtn.addEventListener('click', function(){
+      NewGame();
+      sound.gameaudio.muted = false;
+});
+};
+
+// Game Over Function
+function GameOver(body){
+  // Tạo phần tử div có id là 'tudo'
+  var tudoDiv = document.createElement("div");
+  tudoDiv.id = "tudo";
+
+  // Tạo phần tử div cho gameover và thêm vào tudoDiv
+  var gameoverDiv = document.createElement("div");
+  gameoverDiv.className = "gameover";
+  gameoverDiv.innerHTML = "<p>GAME</p><p>OVER</p>";
+  tudoDiv.appendChild(gameoverDiv);
+
+  // Tạo phần tử div cho continue và thêm vào tudoDiv
+  var continueDiv = document.createElement("div");
+  continueDiv.className = "continue";
+  continueDiv.innerHTML = "<p>CONTINUE?</p>";
+  tudoDiv.appendChild(continueDiv);
+
+  // Tạo phần tử div cho các tùy chọn và thêm vào tudoDiv
+  var opcoesDiv = document.createElement("div");
+  opcoesDiv.className = "opcoes";
+
+  // Tạo phần tử div cho yes và thêm vào opcoesDiv
+  var yesDiv = document.createElement("div");
+  yesDiv.className = "yes";
+  yesDiv.innerHTML = '<a id="YesBtn">YES</a>';
+  opcoesDiv.appendChild(yesDiv);
+
+  // Tạo phần tử div cho no và thêm vào opcoesDiv
+  var noDiv = document.createElement("div");
+  noDiv.className = "no";
+  noDiv.innerHTML = '<a id="NoBtn">NO</a>';
+  opcoesDiv.appendChild(noDiv);
+
+  // Thêm opcoesDiv vào tudoDiv
+  tudoDiv.appendChild(opcoesDiv);
+
+  // Thêm tudoDiv vào body
+  body.appendChild(tudoDiv);
+};
+
+// New Game Function
+function NewGame(){
+  sound.menuaudio.muted = true;
     var body = document.getElementById('body');
     let child = body.lastElementChild;  
-        while (child) { 
-            body.removeChild(child); 
-            child = body.lastElementChild; 
-        }
+    while (child) { 
+        body.removeChild(child); 
+        child = body.lastElementChild; 
+    };
     var h2 = document.createElement('h2');
     h2.textContent = 'Loading Game!!!';
     var loaderDiv = document.createElement('div');
@@ -261,6 +364,26 @@ NewGameBtn.addEventListener('click', function(){
             if (zombieCollision({zombie: model, box: enemy, bboxsize: size, zombieVel: zombieVel})) {
               cancelAnimationFrame(animationId);
               sound.gameaudio.muted = true;
+              /* Game Over */
+              child = body.lastElementChild;  
+              while (child) { 
+                  body.removeChild(child); 
+                  child = body.lastElementChild; 
+              };
+              GameOver(body);
+              let YesBtn = document.getElementById('YesBtn');
+              let NoBtn = document.getElementById('NoBtn');
+              YesBtn.addEventListener("click", function(event) {
+                event.preventDefault();
+                sound.gameaudio.muted = false;
+                NewGame();
+              });
+              NoBtn.addEventListener("click", function(event) {
+                event.preventDefault();
+                sound.menuaudio.muted = false;
+                Menu(body);
+                sound.menu_load();
+              });
             }
           })
           // Update buildings
@@ -442,9 +565,10 @@ NewGameBtn.addEventListener('click', function(){
     }
     animate();
   });
+};
+
+// Button to Start a New Game   
+var NewGameBtn = document.getElementById("New Game");
+NewGameBtn.addEventListener('click', function(){
+    NewGame();
 });
-
-
-
-
-
