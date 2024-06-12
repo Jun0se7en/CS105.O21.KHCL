@@ -390,6 +390,7 @@ function NewGame(){
             enemy.update(boxes);
             if (zombieCollision({zombie: model, box: enemy, bboxsize: size, zombieVel: zombieVel})) {
               cancelAnimationFrame(animationId);
+              model.position.set(0, -1.75, 10);
               sound.gameaudio.muted = true;
               /* Game Over */
               child = body.lastElementChild;  
@@ -560,8 +561,6 @@ function NewGame(){
               sidewalks_2.splice(index, 1)
             }
           })
-
-
 
           if (runAnimation) {
                 runAnimation.update(0.01); 
