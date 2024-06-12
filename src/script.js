@@ -5,6 +5,7 @@ import ExtendBox from './utils.js'
 import Building from './buildings.js';
 import Sound from './sound.js';
 import Skybox from './skybox.js';
+import Sphere from './sphere.js';
 
 function sleep(time) {
   return new Promise((resolve) => setTimeout(resolve, time));
@@ -210,6 +211,7 @@ function NewGame(){
               space: {pressed: false}};
 
     const enemies = []
+    const enemies_sphere = []
     const buildings_1 = []
     const buildings_2 = []
     const sidewalks_1 = []
@@ -422,8 +424,35 @@ function NewGame(){
             }
           })
 
-          //Update tunnel
-
+          enemies_sphere.forEach(enemy => {
+            enemy.update(boxes);
+            if (zombieCollision({zombie: model, box: enemy, bboxsize: size, zombieVel: zombieVel})) {
+              cancelAnimationFrame(animationId);
+              model.position.set(0, -1.75, 10);
+              sound.gameaudio.muted = true;
+              /* Game Over */
+              child = body.lastElementChild;  
+              while (child) { 
+                  body.removeChild(child); 
+                  child = body.lastElementChild; 
+              };
+              GameOver(body);
+              let YesBtn = document.getElementById('YesBtn');
+              let NoBtn = document.getElementById('NoBtn');
+              YesBtn.addEventListener("click", function(event) {
+                event.preventDefault();
+                sound.gameaudio.muted = false;
+                NewGame();
+              });
+              NoBtn.addEventListener("click", function(event) {
+                event.preventDefault();
+                sound.menuaudio.muted = false;
+                Menu(body);
+                sound.menu_load();
+              });
+              console.log('Game Over');
+            }
+          })
 
           // Update buildings
           buildings_1.forEach(building => {
@@ -440,13 +469,13 @@ function NewGame(){
                   scene: scene,
                   loader: new FBXLoader(),
                   scale: 0.03,
-                  position: {x: -15, y: -1.5, z: -45},
+                  position: {x: -15, y: -1.5, z: -50},
                   rotation: {x: 0, y: rotationY, z: 0},
                   velocity: {x: 0, y: 0, z: 0.2},
                   isZaccelerated: true
               }); 
             building.castShadow = true
-            if (frames < 500) buildings_1.push(building);
+            buildings_1.push(building);
             
           } 
 
@@ -461,13 +490,13 @@ function NewGame(){
                   scene: scene,
                   loader: new FBXLoader(),
                   scale: 0.03,
-                  position: {x: 15, y: -1.5, z: -45},
+                  position: {x: 15, y: -1.5, z: -50},
                   rotation: {x: 0, y: rotationY, z: 0},
                   velocity: {x: 0, y: 0, z: 0.2},
                   isZaccelerated: true
               }); 
             building.castShadow = true
-            if(frames < 500) buildings_2.push(building);
+            buildings_2.push(building);
             
 
           }
@@ -483,7 +512,7 @@ function NewGame(){
               heigth: 0.5,
               depth: 10,
               color: "#5b5b5b",
-              position: {x: -17, y: -1.7, z: -40},
+              position: {x: -17, y: -1.7, z: -45},
               texture: texture2,
               isZaccelerated: true,
               velocity: {x: 0, y: 0, z: 0.1},
@@ -502,7 +531,7 @@ function NewGame(){
               heigth: 0.5,
               depth: 10,
               color: "#5b5b5b",
-              position: {x: 17, y: -1.7, z: -40},
+              position: {x: 17, y: -1.7, z: -45},
               texture: texture2,
               isZaccelerated: true,
               velocity: {x: 0, y: 0, z: 0.1},
@@ -537,6 +566,29 @@ function NewGame(){
             scene.add(enemy)
             enemies.push(enemy)
           }
+
+          if (frames % 120 === 0) {
+            const enemy2 = new Sphere({
+              radius: 2,
+              position: {
+                x: (Math.random() - 0.5) * 10,
+                y: 0,
+                z: -20,
+              },
+              velocity: {
+                x: 0,
+                y: 0,
+                z: 0.2,
+              },
+              color: "#bcbcbc",
+              isZaccelerated: true,
+              texture: enemy_texture,
+              rotationSpeed: { x: 0.09, y: 0, z: 0}
+            })
+            enemy2.castShadow = true
+            scene.add(enemy2)
+            enemies_sphere.push(enemy2)
+          }
           //Remove enemies
           enemies.forEach((enemy, index) => {
             if (enemy.position.z > 20) {
@@ -544,20 +596,12 @@ function NewGame(){
               enemies.splice(index, 1)
             }
           })
-
-          //Remove buildings
-          buildings_1.forEach((building, index) => {
-            if (building.position.z > 30) {
-              scene.remove(building.building)
-              buildings_1.splice(index, 1)
-            }
-          })
-          buildings_2.forEach((building, index) => {
-            if (building.position.z > 30) {
-              scene.remove(building.building)
-              buildings_2.splice(index, 1)
-            }
-          })
+          // enemies_sphere.forEach((enemy, index) => {
+          //   if (enemy.position.z > 20) {
+          //     scene.remove(enemy)
+          //     enemies_sphere.splice(index, 1)
+          //   }
+          // })
 
           //Remove sidewalks
           sidewalks_1.forEach((sidewalk, index) => {
