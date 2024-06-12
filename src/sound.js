@@ -11,6 +11,7 @@ export default class Sound {
 
     menu_load(){
         // Add menu audio
+        this.volumeBtn = document.getElementById("volumeBtn");
         this.menuaudio_src.src = this.source;
         this.menuaudio_src.type = 'audio/mpeg';
         this.menuaudio.appendChild(this.menuaudio_src);
@@ -19,24 +20,25 @@ export default class Sound {
         this.menuaudio.play();
 
         // Control Volume of the Game
+        const self = this;
         this.volumeBtn.addEventListener('click', function() {
-            this.volumeUp = !this.volumeUp;
-            let child = this.volumeBtn.lastElementChild;  
-                while (child) { 
-                    this.volumeBtn.removeChild(child); 
-                    child = this.volumeBtn.lastElementChild; 
-                } 
-            if (this.volumeUp == true){
+            self.volumeUp = !self.volumeUp;
+            let child = self.volumeBtn.lastElementChild;  
+            while (child) { 
+                self.volumeBtn.removeChild(child); 
+                child = self.volumeBtn.lastElementChild; 
+            };
+            if (self.volumeUp == true){
                 var button = document.createElement('i');
                 button.className = "fa fa-volume-up";
-                this.volumeBtn.appendChild(button);
-                this.menuaudio.play();
+                self.volumeBtn.appendChild(button);
+                self.menuaudio.play();
             }
             else{
                 var button = document.createElement('i');
                 button.className = "fa fa-volume-off";
-                this.volumeBtn.appendChild(button);
-                this.menuaudio.pause();
+                self.volumeBtn.appendChild(button);
+                self.menuaudio.pause();
             }});
     }
 
