@@ -319,7 +319,7 @@ function NewGame(){
     }
 
     function zombieCollision({zombie, box, bboxsize, zombieVel}){
-            if (zombie.position.x <= -4.5 || zombie.position.x >= 4.5){
+            if (zombie.position.x <= -6 || zombie.position.x >= 6){
               return true;
             }
             const xCollision = zombie.position.x-bboxsize.x/9 <= box.right && zombie.position.x+bboxsize.x/9 >= box.left;
