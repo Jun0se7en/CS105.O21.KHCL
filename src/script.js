@@ -28,7 +28,7 @@ let model;
 let runAnimation;
 const loader = new FBXLoader();
 // Import model 
-function modelCall(){
+async function modelCall(){
     loader.setPath('./src/model/');
     loader.load('mremireh_o_desbiens.fbx', (fbx) => {
     fbx.scale.setScalar(0.01);
@@ -44,20 +44,22 @@ function modelCall(){
             action.play();
         });
     });
+
 };
 
 await(modelCall()); 
+
 
 // Menu sound
 let sound = new Sound();
 sound.source = './src/theme/Temple Run OZ OST- Menu theme.mp3';
 sound.menu_load();
 
-// // Init Clock
-// let clock = new THREE.Clock();
-// let delta = 0;
-// // 30 fps
-// let interval = 1 / 60;
+// Init Clock
+let clock = new THREE.Clock();
+let delta = 0;
+// 30 fps
+let interval = 1 / 60;
 
 // Menu Function
 function Menu(body){
@@ -213,6 +215,7 @@ function NewGame(){
     const sidewalks_1 = []
     const sidewalks_2 = []
     const frameRate = [40, 80, 120, 160]
+    let timer = 0;
 
     let frames = 0;
     let spawnRate = 20;
@@ -365,13 +368,13 @@ function NewGame(){
 
     function animate() {
         const animationId = requestAnimationFrame(animate);
-        // delta += clock.getDelta();
-        // if (delta  > interval) {
-        //     // The draw or time dependent code are here
-        //     renderer.render(scene, camera);
+        delta += clock.getDelta();
+        if (delta  > interval) {
+            // The draw or time dependent code are here
+            renderer.render(scene, camera);
 
-        //     delta = delta % interval;
-        // }
+            delta = delta % interval;
+        }
         renderer.render(scene, camera);
 
         if (keys.a.pressed) {
@@ -415,13 +418,13 @@ function NewGame(){
                 Menu(body);
                 sound.menu_load();
               });
+              console.log('Game Over');
             }
           })
 
           //Update tunnel
 
 
-          
           // Update buildings
           buildings_1.forEach(building => {
             building.update();
@@ -443,7 +446,8 @@ function NewGame(){
                   isZaccelerated: true
               }); 
             building.castShadow = true
-            buildings_1.push(building);
+            if (frames < 500) buildings_1.push(building);
+            
           } 
 
           buildings_2.forEach(building => {
@@ -463,7 +467,9 @@ function NewGame(){
                   isZaccelerated: true
               }); 
             building.castShadow = true
-            buildings_2.push(building);
+            if(frames < 500) buildings_2.push(building);
+            
+
           }
 
         //Create sidewalk at both sides
@@ -506,9 +512,6 @@ function NewGame(){
           sidewalks_2.push(sidewalk_2);
         }
         
-        
-
-        // console.log('count')
           if (frames % spawnRate === 0) {
             //if (spawnRate > 20) spawnRate -= 20; //else spawnRate += 20;
         
