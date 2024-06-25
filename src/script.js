@@ -25,31 +25,63 @@ function createTextTexture(text, width = 256, height = 128) {
   return texture;
 };
 
-let model;
-let runAnimation;
+let model, runAnimation, actionRun, actionFall;
+
 const loader = new FBXLoader();
-// Import model 
+
 async function modelCall(){
     loader.setPath('./src/model/');
-    loader.load('mremireh_o_desbiens.fbx', (fbx) => {
-    fbx.scale.setScalar(0.01);
-    fbx.traverse(c => {
-        c.castShadow = true;
-    });
-    fbx.rotation.y += Math.PI;
-    fbx.position.set(0, -1.75, 10);
-    model = fbx;
-    loader.load('run.fbx', (animObject) => {
+    loader.load('mremireh.fbx', (animObject) => {
+            animObject.scale.setScalar(0.01);
+            animObject.traverse(c => {
+                c.castShadow = true;
+            });
+            animObject.rotation.y += Math.PI;
+            animObject.position.set(0, -1.75, 10);
+            model = animObject;
             runAnimation = new THREE.AnimationMixer(model);
-            const action = runAnimation.clipAction(animObject.animations[0]);
-            action.play();
+            actionRun = runAnimation.clipAction(model.animations[0]);
+            actionFall = runAnimation.clipAction(model.animations[1]);
+            actionRun.play();
+            actionFall.stop();
         });
-    });
 
 };
 
 await(modelCall()); 
 
+let fallDuration = 5;
+let fallStartTime = null;
+let isFallRunning = false;
+
+function fallAnimate() {
+    // actionFall.play();
+    // const elapsedTime = clock.getElapsedTime(); // Get the total time from the clock
+
+    // while (isFallRunning) {
+    //     const fallTime = elapsedTime - fallStartTime; // Calculate time within the animation
+
+    //     if (fallTime <= fallDuration) {
+    //         mixer.update(clock.getDelta());
+    //     } else {
+    //         isFallRunning = false;
+    //         actionFall.stop(); // Stop the animation after the duration
+    //     }
+    // }   
+    // return 1;
+  return new Promise((resolve) => {
+  setTimeout(() => {
+    actionFall.play();
+    resolve();
+    }, 3000);
+  });
+};
+
+async function fallAnimateasync() {
+  let haveFalled = await fallAnimate();
+  actionFall.stop();
+  console.log("OK");
+};
 
 // Menu sound
 let sound = new Sound();
@@ -169,6 +201,8 @@ function GameOver(body){
 // New Game Function
 function NewGame(){
   sound.menuaudio.muted = true;
+    // actionFall.stop();
+    // actionRun.play();
     var body = document.getElementById('body');
     let child = body.lastElementChild;  
     while (child) { 
@@ -397,6 +431,9 @@ function NewGame(){
           enemies.forEach(enemy => {
             enemy.update(boxes);
             if (zombieCollision({zombie: model, box: enemy, bboxsize: size, zombieVel: zombieVel})) {
+              actionRun.stop();
+              fallAnimateasync();
+
               cancelAnimationFrame(animationId);
               model.position.set(0, -1.75, 10);
               sound.gameaudio.muted = true;
@@ -427,6 +464,9 @@ function NewGame(){
           enemies_sphere.forEach(enemy => {
             enemy.update(boxes);
             if (zombieCollision({zombie: model, box: enemy, bboxsize: size, zombieVel: zombieVel})) {
+              actionRun.stop();
+              fallAnimateasync();
+
               cancelAnimationFrame(animationId);
               model.position.set(0, -1.75, 10);
               sound.gameaudio.muted = true;
