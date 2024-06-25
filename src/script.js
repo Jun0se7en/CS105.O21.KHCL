@@ -54,21 +54,9 @@ let fallDuration = 5;
 let fallStartTime = null;
 let isFallRunning = false;
 
+
+//CODE ĐƯỢC THÊM Ở ĐÂY
 function fallAnimate() {
-    // actionFall.play();
-    // const elapsedTime = clock.getElapsedTime(); // Get the total time from the clock
-
-    // while (isFallRunning) {
-    //     const fallTime = elapsedTime - fallStartTime; // Calculate time within the animation
-
-    //     if (fallTime <= fallDuration) {
-    //         mixer.update(clock.getDelta());
-    //     } else {
-    //         isFallRunning = false;
-    //         actionFall.stop(); // Stop the animation after the duration
-    //     }
-    // }   
-    // return 1;
   return new Promise((resolve) => {
   setTimeout(() => {
     actionFall.play();
