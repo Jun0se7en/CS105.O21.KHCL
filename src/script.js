@@ -25,51 +25,31 @@ function createTextTexture(text, width = 256, height = 128) {
   return texture;
 };
 
-let model, runAnimation, actionRun, actionFall;
-
+let model;
+let runAnimation;
+let animationSrc;
 const loader = new FBXLoader();
 
-async function modelCall(){
-    loader.setPath('./src/model/');
-    loader.load('mremireh.fbx', (animObject) => {
-            animObject.scale.setScalar(0.01);
-            animObject.traverse(c => {
-                c.castShadow = true;
-            });
-            animObject.rotation.y += Math.PI;
-            animObject.position.set(0, -1.75, 10);
-            model = animObject;
-            runAnimation = new THREE.AnimationMixer(model);
-            actionRun = runAnimation.clipAction(model.animations[0]);
-            actionFall = runAnimation.clipAction(model.animations[1]);
-            actionRun.play();
-            actionFall.stop();
-        });
+// Import model 
+loader.setPath('./src/model/');
+loader.load('mremireh_o_desbiens.fbx', (fbx) => {
+fbx.scale.setScalar(0.01);
+fbx.traverse(c => {
+    c.castShadow = true;
+});
+fbx.rotation.y += Math.PI;
+fbx.position.set(0, -1.75, 10);
+model = fbx;
 
-};
-
-await(modelCall()); 
-
-let fallDuration = 5;
-let fallStartTime = null;
-let isFallRunning = false;
+animationSrc = 'run_2.fbx';
+loader.load(animationSrc, (animObject) => {
+        runAnimation = new THREE.AnimationMixer(model);
+        const action = runAnimation.clipAction(animObject.animations[0]);
+        action.play();
+    });
+});
 
 
-//CODE ĐƯỢC THÊM Ở ĐÂY
-function fallAnimate() {
-  return new Promise((resolve) => {
-  setTimeout(() => {
-    actionFall.play();
-    resolve();
-    }, 3000);
-  });
-};
-
-async function fallAnimateasync() {
-  let haveFalled = await fallAnimate();
-  actionFall.stop();
-  console.log("OK");
-};
 
 // Menu sound
 let sound = new Sound();
@@ -189,8 +169,6 @@ function GameOver(body){
 // New Game Function
 function NewGame(){
   sound.menuaudio.muted = true;
-    // actionFall.stop();
-    // actionRun.play();
     var body = document.getElementById('body');
     let child = body.lastElementChild;  
     while (child) { 
@@ -380,8 +358,9 @@ function NewGame(){
 })
 
     init();
-    
+    let speed = 0.2;
     let scores = 0;
+    let temp_scores = 0;
     let text_mesh = null;
     const boundingBox = new THREE.Box3().setFromObject(model);
     boundingBox.getSize(new THREE.Vector3());
@@ -391,6 +370,7 @@ function NewGame(){
     //const enemy_material = new THREE.MeshBasicMaterial({map: box_texture});
 
     function animate() {
+        animationSrc = 'run_2.fbx';
         const animationId = requestAnimationFrame(animate);
         delta += clock.getDelta();
         if (delta  > interval) {
@@ -418,11 +398,14 @@ function NewGame(){
           // Update enemies
           enemies.forEach(enemy => {
             enemy.update(boxes);
+            
             if (zombieCollision({zombie: model, box: enemy, bboxsize: size, zombieVel: zombieVel})) {
-              actionRun.stop();
-              fallAnimateasync();
-
-              cancelAnimationFrame(animationId);
+              //cancelAnimationFrame(animationId);
+              loader.load(animationSrc, (animObject) => {
+                runAnimation = new THREE.AnimationMixer(model);
+                const action = runAnimation.clipAction(animObject.animations[0]);
+                action.play();
+              });
               model.position.set(0, -1.75, 10);
               sound.gameaudio.muted = true;
               /* Game Over */
@@ -451,10 +434,8 @@ function NewGame(){
 
           enemies_sphere.forEach(enemy => {
             enemy.update(boxes);
+            
             if (zombieCollision({zombie: model, box: enemy, bboxsize: size, zombieVel: zombieVel})) {
-              actionRun.stop();
-              fallAnimateasync();
-
               cancelAnimationFrame(animationId);
               model.position.set(0, -1.75, 10);
               sound.gameaudio.muted = true;
@@ -499,7 +480,7 @@ function NewGame(){
                   scale: 0.03,
                   position: {x: -15, y: -1.5, z: -50},
                   rotation: {x: 0, y: rotationY, z: 0},
-                  velocity: {x: 0, y: 0, z: 0.2},
+                  velocity: {x: 0, y: 0, z: speed},
                   isZaccelerated: true
               }); 
             building.castShadow = true
@@ -520,7 +501,7 @@ function NewGame(){
                   scale: 0.03,
                   position: {x: 15, y: -1.5, z: -50},
                   rotation: {x: 0, y: rotationY, z: 0},
-                  velocity: {x: 0, y: 0, z: 0.2},
+                  velocity: {x: 0, y: 0, z: speed},
                   isZaccelerated: true
               }); 
             building.castShadow = true
@@ -543,7 +524,7 @@ function NewGame(){
               position: {x: -17, y: -1.7, z: -45},
               texture: texture2,
               isZaccelerated: true,
-              velocity: {x: 0, y: 0, z: 0.1},
+              velocity: {x: 0, y: 0, z: speed/2},
             });
           sidewalk_1.receiveShadow = true;
           scene.add(sidewalk_1);
@@ -562,7 +543,7 @@ function NewGame(){
               position: {x: 17, y: -1.7, z: -45},
               texture: texture2,
               isZaccelerated: true,
-              velocity: {x: 0, y: 0, z: 0.1},
+              velocity: {x: 0, y: 0, z: speed/2},
             });
           sidewalk_2.receiveShadow = true;
           scene.add(sidewalk_2);
@@ -584,7 +565,7 @@ function NewGame(){
               velocity: {
                 x: 0,
                 y: 0,
-                z: 0.2,
+                z: speed,
               },
               color: "#bcbcbc",
               isZaccelerated: true,
@@ -606,12 +587,12 @@ function NewGame(){
               velocity: {
                 x: 0,
                 y: 0,
-                z: 0.2,
+                z: speed,
               },
               color: "#bcbcbc",
               isZaccelerated: true,
               texture: enemy_texture,
-              rotationSpeed: { x: 0.09, y: 0, z: 0}
+              rotationSpeed: { x: speed * 0.45, y: 0, z: 0}
             })
             enemy2.castShadow = true
             scene.add(enemy2)
@@ -625,10 +606,10 @@ function NewGame(){
             }
           })
           enemies_sphere.forEach((enemy, index) => {
-             if (enemy.position.z > 20) {
-               scene.remove(enemy)
-               enemies_sphere.splice(index, 1)
-             }
+            if (enemy.position.z > 20) {
+              scene.remove(enemy)
+              enemies_sphere.splice(index, 1)
+            }
           })
 
           //Remove sidewalks
@@ -650,6 +631,8 @@ function NewGame(){
           }
           frames++;
           scores += 10;
+          temp_scores = scores;
+          
           if (text_mesh) {
               scene.remove(text_mesh);
               text_mesh.geometry.dispose();
