@@ -7,6 +7,69 @@ import Sound from './sound.js';
 import Skybox from './skybox.js';
 import Sphere from './sphere.js';
 
+// Hàm khởi tạo danh sách người chơi ngẫu nhiên
+function initializeScores() {
+  const initialScores = [];
+  for (let i = 1; i <= 10; i++) {
+    initialScores.push({ name: `Player${i}`, score: 1000 + Math.floor(Math.random() * 1000) });
+  }
+  localStorage.setItem('scores', JSON.stringify(initialScores));
+}
+
+// Hàm đọc điểm số từ Local Storage
+function readScores() {
+  const scores = localStorage.getItem('scores');
+  return scores ? JSON.parse(scores) : null;
+}
+
+// Hàm lưu điểm số vào Local Storage
+function saveScores(scores) {
+  localStorage.setItem('scores', JSON.stringify(scores));
+}
+
+// Hàm cập nhật điểm số của người chơi
+function updateScores(playerName, playerScore) {
+  let scores = readScores();
+  if (!scores) {
+    initializeScores();
+    scores = readScores();
+  }
+
+  // Kiểm tra nếu điểm của người chơi hiện tại cao hơn điểm thấp nhất
+  if (scores.length < 10 || playerScore > scores[scores.length - 1].score) {
+    // Thêm điểm của người chơi hiện tại
+    scores.push({ name: playerName, score: playerScore });
+
+    // Sắp xếp lại danh sách điểm số từ cao đến thấp
+    scores.sort((a, b) => b.score - a.score);
+
+    // Chỉ giữ lại top 10
+    if (scores.length > 10) {
+      scores.pop();
+    }
+
+    // Lưu lại danh sách điểm số
+    saveScores(scores);
+    console.log('Score updated!');
+  } else {
+    console.log('Score is not high enough to be saved.');
+  }
+}
+
+function displayScores() {
+  const scores = readScores();
+  if (scores) {
+    console.log("High Scores:");
+    scores.forEach((score, index) => {
+      console.log(`${index + 1}. ${score.name}: ${score.score}`);
+    });
+  } else {
+    console.log("No scores available.");
+  }
+}
+
+const PlayerName = "Hehe"
+
 function sleep(time) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
@@ -126,7 +189,10 @@ function Menu(body){
 };
 
 // Game Over Function
-function GameOver(body){
+function GameOver(body, scores){
+  displayScores();
+  updateScores(PlayerName, scores);
+  displayScores();
   // Tạo phần tử div có id là 'tudo'
   var tudoDiv = document.createElement("div");
   tudoDiv.id = "tudo";
@@ -136,6 +202,12 @@ function GameOver(body){
   gameoverDiv.className = "gameover";
   gameoverDiv.innerHTML = "<p>GAME</p><p>OVER</p>";
   tudoDiv.appendChild(gameoverDiv);
+
+  // Tạo phần tử div cho scores và thêm vào tudoDiv
+  var continueDiv = document.createElement("div");
+  continueDiv.className = "continue";
+  continueDiv.innerHTML = "<p>Scores: "+scores+"</p>";
+  tudoDiv.appendChild(continueDiv);
 
   // Tạo phần tử div cho continue và thêm vào tudoDiv
   var continueDiv = document.createElement("div");
@@ -251,9 +323,6 @@ function NewGame(){
     
 
     function init(){
-        const orbitControls = new OrbitControls(camera, renderer.domElement);
-        orbitControls.update();
-
         //Add skybox
         Skybox(scene);
   
@@ -414,7 +483,7 @@ function NewGame(){
                   body.removeChild(child); 
                   child = body.lastElementChild; 
               };
-              GameOver(body);
+              GameOver(body, scores);
               let YesBtn = document.getElementById('YesBtn');
               let NoBtn = document.getElementById('NoBtn');
               YesBtn.addEventListener("click", function(event) {
@@ -445,7 +514,7 @@ function NewGame(){
                   body.removeChild(child); 
                   child = body.lastElementChild; 
               };
-              GameOver(body);
+              GameOver(body, scores);
               let YesBtn = document.getElementById('YesBtn');
               let NoBtn = document.getElementById('NoBtn');
               YesBtn.addEventListener("click", function(event) {
